@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Check, Globe, Clock, FileText } from 'lucide-react';
+import { Globe, Clock, FileText, Check } from 'lucide-react';
 
 const BenefitCard = ({ icon, title, description }: { 
   icon: React.ReactNode, 
@@ -8,12 +8,12 @@ const BenefitCard = ({ icon, title, description }: {
   description: string 
 }) => {
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
-      <div className="w-12 h-12 bg-transumee-50 rounded-full flex items-center justify-center text-transumee-600 mb-4">
+    <div className="bg-white p-8 rounded-2xl shadow-sm border border-transumee-200 hover:shadow-md transition-all">
+      <div className="w-12 h-12 bg-transumee-100 rounded-full flex items-center justify-center text-purple-500 mb-5">
         {icon}
       </div>
-      <h3 className="text-lg font-semibold mb-2">{title}</h3>
-      <p className="text-gray-600">{description}</p>
+      <h3 className="text-lg font-semibold mb-3 text-transumee-900">{title}</h3>
+      <p className="text-transumee-900/70">{description}</p>
     </div>
   );
 };
@@ -22,12 +22,12 @@ const Benefits = () => {
   const benefits = [
     {
       icon: <Clock size={24} />,
-      title: "Instant AI Translation & Formatting",
+      title: "Instant AI Translation",
       description: "Our AI transforms your resume in seconds, with perfect formatting and professional language."
     },
     {
       icon: <Globe size={24} />,
-      title: "Localized for USA, Canada, UK, EU",
+      title: "Localized Formatting",
       description: "Tailored to meet specific regional job market standards and expectations."
     },
     {
@@ -43,12 +43,12 @@ const Benefits = () => {
   ];
 
   return (
-    <section className="py-16 px-4 bg-gray-50">
+    <section className="py-20 px-4 bg-transumee-100/50">
       <div className="container mx-auto max-w-6xl">
-        <h2 className="text-3xl font-bold text-center mb-12">
+        <h2 className="text-3xl font-bold text-center mb-16 text-transumee-900">
           Transform Your Career Opportunities
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {benefits.map((benefit, index) => (
             <BenefitCard 
               key={index}

@@ -63,17 +63,22 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
+				// New custom colors based on your specification
 				transumee: {
-					50: '#f5f3ff',
-					100: '#ede9fe',
-					200: '#ddd6fe',
-					300: '#c4b5fd',
-					400: '#a78bfa',
-					500: '#8b5cf6',
-					600: '#7c3aed',
-					700: '#6d28d9',
-					800: '#5b21b6',
-					900: '#4c1d95',
+					50: '#F9FAFB',  // background
+					100: '#EFF6FF',
+					200: '#DBEAFE',
+					300: '#BFDBFE', 
+					400: '#93C5FD',
+					500: '#60A5FA',
+					600: '#3B82F6',  // primary
+					700: '#2563EB',  // button hover
+					800: '#1D4ED8',
+					900: '#1E293B',  // text
+				},
+				purple: {
+					500: '#8B5CF6',  // accent
+					600: '#7C3AED',
 				}
 			},
 			borderRadius: {
