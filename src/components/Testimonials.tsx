@@ -28,13 +28,13 @@ const TestimonialCard = ({ quote, name, title, country }: TestimonialProps) => {
 const Testimonials = () => {
   const testimonials = [
     {
-      quote: ""I uploaded my Spanish resume and got back a perfectly formatted English version tailored for the US market. I received 3 interview calls within a week!"",
+      quote: "\"I uploaded my Spanish resume and got back a perfectly formatted English version tailored for the US market. I received 3 interview calls within a week!\"",
       name: "Miguel Rodriguez",
       title: "Software Engineer",
       country: "Spain → USA",
     },
     {
-      quote: ""As a French professional moving to Canada, I needed my CV translated correctly. Transumee did it in minutes with perfect Canadian formatting. Incredible service!"",
+      quote: "\"As a French professional moving to Canada, I needed my CV translated correctly. Transumee did it in minutes with perfect Canadian formatting. Incredible service!\"",
       name: "Céline Dupont",
       title: "Marketing Specialist",
       country: "France → Canada",
