@@ -2,6 +2,7 @@
 import React from 'react';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
+import HowItWorks from '@/components/HowItWorks';
 import Benefits from '@/components/Benefits';
 import UploadForm from '@/components/UploadForm';
 import Testimonials from '@/components/Testimonials';
@@ -12,6 +13,7 @@ const Index = () => {
     <div className="min-h-screen bg-transumee-50">
       <Header />
       <Hero />
+      <HowItWorks />
       <Benefits />
       <UploadForm />
       <Testimonials />

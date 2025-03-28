@@ -39,6 +39,18 @@ const Testimonials = () => {
       title: "Marketing Specialist",
       country: "France → Canada",
     },
+    {
+      quote: "\"It took me just 60 seconds to get a perfect CV in English. The AI even adapted my experience to match UK terminology. Amazing.\"",
+      name: "Hans Weber",
+      title: "Project Manager",
+      country: "Germany → UK",
+    },
+    {
+      quote: "\"The cover letter generation feature saved me hours of work. I couldn't believe how well it captured my professional story.\"",
+      name: "Sofia Rossi",
+      title: "Marketing Director",
+      country: "Italy → USA",
+    },
   ];
 
   return (
@@ -48,7 +60,8 @@ const Testimonials = () => {
         <p className="text-center text-transumee-900/70 mb-16 max-w-2xl mx-auto">
           Join thousands of professionals who have improved their job prospects with Transumee
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-20">
           {testimonials.map((testimonial, index) => (
             <TestimonialCard
               key={index}
@@ -58,6 +71,40 @@ const Testimonials = () => {
               country={testimonial.country}
             />
           ))}
+        </div>
+        
+        <div className="bg-white p-10 rounded-3xl shadow-md border border-transumee-200">
+          <h3 className="text-2xl font-bold text-center mb-8 text-transumee-900">See the Transformation</h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="relative">
+              <div className="absolute -top-4 -left-4 bg-transumee-600 text-white text-sm font-medium py-1 px-3 rounded-full">
+                Original Resume
+              </div>
+              <div className="border border-transumee-200 rounded-xl p-4 h-72 bg-transumee-50">
+                <div className="w-full h-full bg-gray-200 rounded-lg blur-sm overflow-hidden flex items-center justify-center">
+                  <div className="text-gray-400 font-medium">Foreign language resume</div>
+                </div>
+              </div>
+            </div>
+            <div className="relative">
+              <div className="absolute -top-4 -left-4 bg-purple-500 text-white text-sm font-medium py-1 px-3 rounded-full">
+                AI Transformed
+              </div>
+              <div className="border border-transumee-200 rounded-xl p-4 h-72 bg-white shadow-sm">
+                <div className="w-full h-full bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center relative">
+                  <div className="absolute inset-0 bg-white/50 backdrop-blur-sm flex items-center justify-center">
+                    <div className="text-transumee-600 font-medium">Professional English Resume</div>
+                  </div>
+                  <div className="absolute top-4 left-4 w-24 h-24 rounded-full bg-transumee-100"></div>
+                  <div className="absolute top-4 right-4 w-32 h-4 rounded-full bg-transumee-100"></div>
+                  <div className="absolute top-12 right-4 w-20 h-4 rounded-full bg-transumee-100"></div>
+                  <div className="absolute top-36 left-4 right-4 h-3 rounded-full bg-transumee-100"></div>
+                  <div className="absolute top-44 left-4 right-4 h-3 rounded-full bg-transumee-100"></div>
+                  <div className="absolute top-52 left-4 right-4 h-3 rounded-full bg-transumee-100"></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
