@@ -11,7 +11,7 @@ const Hero = () => {
   };
 
   return (
-    <div className="flex-1">
+    <div className="flex-1 text-center">
       <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4 bg-gradient-to-r from-transumee-600 to-purple-500 bg-clip-text text-transparent">
         Your Resume. Translated. Upgraded.
       </h1>
