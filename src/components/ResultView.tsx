@@ -14,7 +14,7 @@ interface ResultViewProps {
 
 const ResultView = ({ translatedResume, isFallbackMode, handleNewUpload }: ResultViewProps) => {
   const { toast } = useToast();
-  const [showChat, setShowChat] = useState(true); // Set to true by default to show chat
+  const [showChat, setShowChat] = useState(true); // Keep this true by default
 
   const handleCopyToClipboard = () => {
     if (translatedResume) {
@@ -57,18 +57,6 @@ const ResultView = ({ translatedResume, isFallbackMode, handleNewUpload }: Resul
           Upload Another Resume
         </Button>
       </div>
-      
-      <Button
-        onClick={() => setShowChat(!showChat)}
-        className="w-full bg-transumee-100 hover:bg-transumee-200 text-transumee-800 rounded-xl flex items-center justify-center mb-4"
-      >
-        {showChat ? "Hide Resume Assistant" : "Show Resume Assistant"}
-        {showChat ? <ChevronUp className="ml-2" size={16} /> : <ChevronDown className="ml-2" size={16} />}
-      </Button>
-      
-      {showChat && translatedResume && (
-        <ChatBot resumeContent={translatedResume} />
-      )}
     </div>
   );
 };
