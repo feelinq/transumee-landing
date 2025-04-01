@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/components/ui/use-toast';
@@ -15,6 +15,17 @@ interface ResultViewProps {
 const ResultView = ({ translatedResume, isFallbackMode, handleNewUpload }: ResultViewProps) => {
   const { toast } = useToast();
   const [showChat, setShowChat] = useState(true); // Keep this true by default
+
+  useEffect(() => {
+    // Dispatch custom event with resume content when the component mounts
+    if (translatedResume) {
+      const event = new CustomEvent('resumeProcessed', {
+        detail: { resumeContent: translatedResume }
+      });
+      window.dispatchEvent(event);
+      console.log("Dispatched resumeProcessed event with content");
+    }
+  }, [translatedResume]);
 
   const handleCopyToClipboard = () => {
     if (translatedResume) {

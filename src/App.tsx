@@ -20,6 +20,7 @@ const App = () => {
     const handleResumeProcessed = (event: CustomEvent) => {
       if (event.detail?.resumeContent) {
         setResumeContent(event.detail.resumeContent);
+        console.log("Resume content received for ChatGPT:", event.detail.resumeContent.substring(0, 50) + "...");
       }
     };
     

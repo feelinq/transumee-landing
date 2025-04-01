@@ -21,7 +21,7 @@ const ChatBot = ({ resumeContent }: ChatBotProps) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      content: "Hello! I'm your resume assistant. Ask me questions about improving your resume or for advice on job applications.",
+      content: "Hello! I'm your resume assistant powered by ChatGPT. Ask me questions about improving your resume or for advice on job applications.",
       role: 'assistant'
     }
   ]);
@@ -55,11 +55,14 @@ const ChatBot = ({ resumeContent }: ChatBotProps) => {
 
     try {
       console.log("Sending request to resume-chat function");
+      // Filter out just the content and role for the API call
+      const conversationHistory = messages.map(({ content, role }) => ({ content, role }));
+      
       const response = await supabase.functions.invoke("resume-chat", {
         body: {
           message: input,
           resumeContent,
-          conversation: messages.map(({ content, role }) => ({ content, role }))
+          conversation: conversationHistory
         }
       });
 
@@ -75,7 +78,7 @@ const ChatBot = ({ resumeContent }: ChatBotProps) => {
       };
 
       setMessages(prev => [...prev, botResponse]);
-      console.log("Got response successfully");
+      console.log("Got response successfully from ChatGPT");
     } catch (error) {
       console.error("Chat Error:", error);
       toast({
@@ -87,7 +90,7 @@ const ChatBot = ({ resumeContent }: ChatBotProps) => {
       // Add fallback response
       const fallbackResponse = {
         id: (Date.now() + 1).toString(),
-        content: "I'm sorry, I'm having trouble connecting right now. Please try again later.",
+        content: "I'm sorry, I'm having trouble connecting to ChatGPT right now. Please try again later.",
         role: 'assistant' as const
       };
 
@@ -106,7 +109,7 @@ const ChatBot = ({ resumeContent }: ChatBotProps) => {
       >
         <div className="flex items-center">
           <MessageCircle size={20} className="mr-2" />
-          <h3 className="font-medium">Resume Assistant</h3>
+          <h3 className="font-medium">Resume Assistant (ChatGPT)</h3>
         </div>
         <div className="flex items-center">
           {isCollapsed ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
