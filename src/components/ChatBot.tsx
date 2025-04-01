@@ -8,7 +8,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface ChatBotProps {
-  resumeContent: string;
+  resumeContent: string | null;
 }
 
 type Message = {
@@ -17,7 +17,7 @@ type Message = {
   role: 'user' | 'assistant';
 };
 
-const ChatBot = ({ resumeContent }: ChatBotProps) => {
+const ChatBot = ({ resumeContent = "I'm here to help with general resume and job application questions." }: ChatBotProps) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -61,7 +61,7 @@ const ChatBot = ({ resumeContent }: ChatBotProps) => {
       const response = await supabase.functions.invoke("resume-chat", {
         body: {
           message: input,
-          resumeContent,
+          resumeContent: resumeContent || "No specific resume provided",
           conversation: conversationHistory
         }
       });

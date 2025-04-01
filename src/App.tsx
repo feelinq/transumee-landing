@@ -12,7 +12,7 @@ import ChatBot from "./components/ChatBot";
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [resumeContent, setResumeContent] = useState<string | null>(null);
+  const [resumeContent, setResumeContent] = useState<string | null>("Welcome to Transumee! I can help answer questions about resumes and job applications.");
 
   // Listen for resume content - this would be enhanced in a real app
   // to store and retrieve resume content from local storage or state management
@@ -45,8 +45,8 @@ const App = () => {
           </Routes>
         </BrowserRouter>
         
-        {/* Floating chat will show only if we have resume content */}
-        {resumeContent && <ChatBot resumeContent={resumeContent} />}
+        {/* Floating chat is always visible now */}
+        <ChatBot resumeContent={resumeContent} />
       </TooltipProvider>
     </QueryClientProvider>
   );
