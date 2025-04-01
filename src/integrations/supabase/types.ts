@@ -11,31 +11,16 @@ export type Database = {
     Tables: {
       ClientData: {
         Row: {
-          create_at: string | null
-          id: string
-          source_lang: string | null
-          source_text: string | null
-          target_lang: string | null
-          translated_text: string | null
-          user_id: string | null
+          email: string
+          password: string | null
         }
         Insert: {
-          create_at?: string | null
-          id?: string
-          source_lang?: string | null
-          source_text?: string | null
-          target_lang?: string | null
-          translated_text?: string | null
-          user_id?: string | null
+          email?: string
+          password?: string | null
         }
         Update: {
-          create_at?: string | null
-          id?: string
-          source_lang?: string | null
-          source_text?: string | null
-          target_lang?: string | null
-          translated_text?: string | null
-          user_id?: string | null
+          email?: string
+          password?: string | null
         }
         Relationships: []
       }

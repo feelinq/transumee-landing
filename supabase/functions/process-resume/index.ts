@@ -27,6 +27,25 @@ serve(async (req) => {
     // Get target country specific instructions
     const countrySpecificPrompt = getCountrySpecificPrompt(country);
     
+    // Check if the content length is too long
+    if (fileContent.length > 100000) {
+      console.log("File content too large, using fallback mode");
+      const fallbackResume = generateFallbackEnhancement(fileContent, country, countrySpecificPrompt);
+      
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          enhancedResume: fallbackResume,
+          fallbackMode: true,
+          message: "Using fallback enhancement mode due to content length."
+        }),
+        { 
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        }
+      );
+    }
+    
     try {
       // Process with OpenAI
       const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -52,10 +71,11 @@ serve(async (req) => {
               ${countrySpecificPrompt}
               
               Here's the resume content:
-              ${fileContent}`
+              ${fileContent.substring(0, 8000)}`
             }
           ],
           temperature: 0.7,
+          max_tokens: 2000,
         }),
       });
 
@@ -63,45 +83,46 @@ serve(async (req) => {
         const errorData = await openaiResponse.json();
         console.error("OpenAI API error:", errorData);
         
-        // Handle quota exceeded error with a special code
-        if (errorData.error?.code === "insufficient_quota") {
-          return new Response(
-            JSON.stringify({ 
-              success: false, 
-              error: "API_QUOTA_EXCEEDED",
-              message: "OpenAI API quota exceeded. Using fallback mode."
-            }),
-            { 
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-              status: 429,
-            }
-          );
-        }
+        // Handle quota exceeded error and other errors with fallback mode
+        console.log("API error detected, using fallback mode");
+        const fallbackResume = generateFallbackEnhancement(fileContent, country, countrySpecificPrompt);
         
-        throw new Error(`OpenAI API error: ${errorData.error?.message || "Unknown error"}`);
+        return new Response(
+          JSON.stringify({ 
+            success: true, 
+            enhancedResume: fallbackResume,
+            fallbackMode: true,
+            message: "Using fallback enhancement mode due to API limitations."
+          }),
+          { 
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+          }
+        );
       }
 
       const openaiData = await openaiResponse.json();
       const enhancedResume = openaiData.choices[0].message.content;
       
       // Save to Supabase
-      const supabase = createClient(
-        Deno.env.get("SUPABASE_URL") || "",
-        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "",
-      );
+      try {
+        const supabase = createClient(
+          Deno.env.get("SUPABASE_URL") || "",
+          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "",
+        );
 
-      const { data, error } = await supabase.from("ClientData").insert([
-        {
-          user_id: null, // Anonymous user for now
-          source_text: fileContent,
-          translated_text: enhancedResume,
-          target_lang: "english",
-          source_lang: "detected", // In a real app, you'd detect the language
-        },
-      ]);
-
-      if (error) {
-        console.error("Supabase error:", error);
+        await supabase.from("ClientData").insert([
+          {
+            user_id: null, // Anonymous user for now
+            source_text: fileContent.substring(0, 1000), // Store only a preview to save space
+            translated_text: enhancedResume,
+            target_lang: "english",
+            source_lang: "detected", // In a real app, you'd detect the language
+          },
+        ]);
+      } catch (dbError) {
+        console.error("Database error:", dbError);
+        // Continue even if DB save fails
       }
 
       return new Response(
@@ -137,10 +158,15 @@ serve(async (req) => {
   } catch (error) {
     console.error("Error processing resume:", error);
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ 
+        success: false, 
+        error: error.message,
+        fallbackMode: true, 
+        enhancedResume: "We couldn't process your resume. Please try again with a different file or format."
+      }),
       { 
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 400,
+        status: 200, // Changed to 200 to ensure client always gets a response
       }
     );
   }
@@ -277,5 +303,5 @@ function getCountrySpecificPrompt(country) {
     "other": "Focus on transferable skills and achievements. Highlight international experience. Use clear, straightforward English.",
   };
   
-  return countryPrompts[country] || countryPrompts["other"];
+  return countryPrompts[country.toLowerCase()] || countryPrompts["other"];
 }
