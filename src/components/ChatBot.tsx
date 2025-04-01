@@ -20,7 +20,7 @@ const ChatBot = ({ resumeContent }: ChatBotProps) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      content: "Hello! I'm your resume assistant. You can ask me questions about improving your resume or for advice on job applications.",
+      content: "Hello! I'm your resume assistant. Ask me questions about improving your resume or for advice on job applications.",
       role: 'assistant'
     }
   ]);
@@ -52,6 +52,7 @@ const ChatBot = ({ resumeContent }: ChatBotProps) => {
     setIsLoading(true);
 
     try {
+      console.log("Sending request to resume-chat function");
       const response = await supabase.functions.invoke("resume-chat", {
         body: {
           message: input,
@@ -61,6 +62,7 @@ const ChatBot = ({ resumeContent }: ChatBotProps) => {
       });
 
       if (response.error) {
+        console.error("Supabase function error:", response.error);
         throw new Error(response.error.message || "Error processing your question");
       }
 
@@ -71,6 +73,7 @@ const ChatBot = ({ resumeContent }: ChatBotProps) => {
       };
 
       setMessages(prev => [...prev, botResponse]);
+      console.log("Got response successfully");
     } catch (error) {
       console.error("Chat Error:", error);
       toast({
@@ -93,7 +96,7 @@ const ChatBot = ({ resumeContent }: ChatBotProps) => {
   };
 
   return (
-    <div className="bg-white rounded-3xl shadow-lg p-4 md:p-6 border border-transumee-200 mt-6">
+    <div className="bg-white rounded-3xl shadow-lg p-4 md:p-6 border border-transumee-200">
       <h3 className="text-lg font-bold mb-4 text-center text-transumee-900">Resume Assistant</h3>
       
       <div className="mb-4 p-4 bg-transumee-50 rounded-xl border border-transumee-200 h-[300px] overflow-y-auto flex flex-col gap-3">
