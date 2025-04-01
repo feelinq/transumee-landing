@@ -15,6 +15,7 @@ const UploadForm = () => {
   const [country, setCountry] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [translatedResume, setTranslatedResume] = useState<string | null>(null);
+  const [isFallbackMode, setIsFallbackMode] = useState(false);
   const { toast } = useToast();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +46,7 @@ const UploadForm = () => {
         const fileContent = event.target?.result as string;
         
         // Call our edge function
-        const { data, error } = await supabase.functions.invoke("process-resume", {
+        const response = await supabase.functions.invoke("process-resume", {
           body: {
             name,
             email,
@@ -55,15 +56,32 @@ const UploadForm = () => {
           }
         });
 
-        if (error) {
-          throw new Error(error.message);
+        if (response.error) {
+          // Check if it's a quota exceeded error
+          if (response.error.message.includes("429")) {
+            setIsFallbackMode(true);
+            toast({
+              title: "Using fallback mode",
+              description: "API quota exceeded. Using simplified enhancement.",
+              variant: "warning",
+            });
+          } else {
+            throw new Error(response.error.message);
+          }
         }
 
-        setTranslatedResume(data.enhancedResume);
+        // Check if we're in fallback mode
+        if (response.data?.fallbackMode) {
+          setIsFallbackMode(true);
+        }
+
+        setTranslatedResume(response.data.enhancedResume);
         
         toast({
           title: "Success!",
-          description: "Your resume has been translated and upgraded successfully.",
+          description: response.data.fallbackMode 
+            ? "Your resume has been enhanced using our simplified system."
+            : "Your resume has been translated and upgraded successfully.",
         });
       };
       
@@ -90,6 +108,7 @@ const UploadForm = () => {
     setEmail('');
     setFile(null);
     setCountry('');
+    setIsFallbackMode(false);
     // Reset the file input
     const fileInput = document.getElementById('cv-upload') as HTMLInputElement;
     if (fileInput) fileInput.value = '';
@@ -99,7 +118,15 @@ const UploadForm = () => {
     return (
       <div id="upload-form" className="flex-1">
         <div className="bg-white rounded-3xl shadow-lg p-6 md:p-8 border border-transumee-200">
-          <h2 className="text-xl font-bold mb-6 text-center text-transumee-900">Your Translated & Upgraded Resume</h2>
+          <h2 className="text-xl font-bold mb-6 text-center text-transumee-900">Your {isFallbackMode ? 'Enhanced' : 'Translated & Upgraded'} Resume</h2>
+          
+          {isFallbackMode && (
+            <div className="mb-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
+              <p className="text-sm text-amber-800">
+                Note: We're using our simplified enhancement system due to high demand. Your resume has been enhanced with basic improvements.
+              </p>
+            </div>
+          )}
           
           <div className="mb-6 p-4 bg-transumee-50 rounded-xl border border-transumee-200 max-h-[500px] overflow-y-auto">
             <pre className="whitespace-pre-wrap text-sm text-transumee-900">{translatedResume}</pre>
