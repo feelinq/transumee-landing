@@ -1,8 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/components/ui/use-toast';
+import ChatBot from './ChatBot';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface ResultViewProps {
   translatedResume: string | null;
@@ -12,6 +14,7 @@ interface ResultViewProps {
 
 const ResultView = ({ translatedResume, isFallbackMode, handleNewUpload }: ResultViewProps) => {
   const { toast } = useToast();
+  const [showChat, setShowChat] = useState(false);
 
   const handleCopyToClipboard = () => {
     if (translatedResume) {
@@ -39,7 +42,7 @@ const ResultView = ({ translatedResume, isFallbackMode, handleNewUpload }: Resul
         <pre className="whitespace-pre-wrap text-sm text-transumee-900">{translatedResume}</pre>
       </div>
       
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-4 mb-4">
         <Button 
           onClick={handleCopyToClipboard}
           className="flex-1 bg-transumee-600 hover:bg-transumee-700 text-white rounded-xl"
@@ -54,6 +57,18 @@ const ResultView = ({ translatedResume, isFallbackMode, handleNewUpload }: Resul
           Upload Another Resume
         </Button>
       </div>
+      
+      <Button
+        onClick={() => setShowChat(!showChat)}
+        className="w-full bg-transumee-100 hover:bg-transumee-200 text-transumee-800 rounded-xl flex items-center justify-center"
+      >
+        {showChat ? "Hide Chat Assistant" : "Ask AI Assistant for Help"}
+        {showChat ? <ChevronUp className="ml-2" size={16} /> : <ChevronDown className="ml-2" size={16} />}
+      </Button>
+      
+      {showChat && translatedResume && (
+        <ChatBot resumeContent={translatedResume} />
+      )}
     </div>
   );
 };

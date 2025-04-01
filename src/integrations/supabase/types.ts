@@ -11,14 +11,17 @@ export type Database = {
     Tables: {
       ClientData: {
         Row: {
+          created_at: string | null
           email: string
           password: string | null
         }
         Insert: {
-          email?: string
+          created_at?: string | null
+          email: string
           password?: string | null
         }
         Update: {
+          created_at?: string | null
           email?: string
           password?: string | null
         }
