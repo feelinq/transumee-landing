@@ -1,1 +1,5 @@
+
 project_id = "etisopnidkyjlbedkswq"
+
+[functions.process-resume]
+verify_jwt = false

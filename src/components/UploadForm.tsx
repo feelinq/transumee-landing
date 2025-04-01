@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Upload } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { supabase } from "@/integrations/supabase/client";
 
 const UploadForm = () => {
   const [name, setName] = useState('');
@@ -13,6 +14,7 @@ const UploadForm = () => {
   const [file, setFile] = useState<File | null>(null);
   const [country, setCountry] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [translatedResume, setTranslatedResume] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,26 +24,113 @@ const UploadForm = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!file || !name || !email || !country) {
+      toast({
+        title: "Missing information",
+        description: "Please fill all required fields and upload a resume.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     
-    // Simulate form submission
-    setTimeout(() => {
+    try {
+      // Read the file
+      const fileReader = new FileReader();
+      fileReader.onload = async (event) => {
+        const fileContent = event.target?.result as string;
+        
+        // Call our edge function
+        const { data, error } = await supabase.functions.invoke("process-resume", {
+          body: {
+            name,
+            email,
+            fileContent,
+            country,
+            fileType: file.type
+          }
+        });
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        setTranslatedResume(data.enhancedResume);
+        
+        toast({
+          title: "Success!",
+          description: "Your resume has been translated and upgraded successfully.",
+        });
+      };
+      
+      fileReader.onerror = (error) => {
+        throw new Error("Error reading file");
+      };
+      
+      fileReader.readAsText(file);
+    } catch (error) {
+      console.error("Error processing resume:", error);
       toast({
-        title: "Success!",
-        description: "Your resume has been uploaded. We'll send your translated version shortly.",
+        title: "Error",
+        description: "There was a problem processing your resume. Please try again.",
+        variant: "destructive",
       });
+    } finally {
       setIsSubmitting(false);
-      setName('');
-      setEmail('');
-      setFile(null);
-      setCountry('');
-      // Reset the file input
-      const fileInput = document.getElementById('cv-upload') as HTMLInputElement;
-      if (fileInput) fileInput.value = '';
-    }, 1500);
+    }
   };
+
+  const handleNewUpload = () => {
+    setTranslatedResume(null);
+    setName('');
+    setEmail('');
+    setFile(null);
+    setCountry('');
+    // Reset the file input
+    const fileInput = document.getElementById('cv-upload') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
+  };
+
+  if (translatedResume) {
+    return (
+      <div id="upload-form" className="flex-1">
+        <div className="bg-white rounded-3xl shadow-lg p-6 md:p-8 border border-transumee-200">
+          <h2 className="text-xl font-bold mb-6 text-center text-transumee-900">Your Translated & Upgraded Resume</h2>
+          
+          <div className="mb-6 p-4 bg-transumee-50 rounded-xl border border-transumee-200 max-h-[500px] overflow-y-auto">
+            <pre className="whitespace-pre-wrap text-sm text-transumee-900">{translatedResume}</pre>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Button 
+              onClick={() => {
+                // Copy to clipboard
+                navigator.clipboard.writeText(translatedResume);
+                toast({
+                  title: "Copied!",
+                  description: "Resume content copied to clipboard",
+                });
+              }}
+              className="flex-1 bg-transumee-600 hover:bg-transumee-700 text-white rounded-xl"
+            >
+              Copy to Clipboard
+            </Button>
+            
+            <Button 
+              onClick={handleNewUpload}
+              className="flex-1 bg-gradient-to-r from-transumee-600 to-purple-500 hover:from-transumee-700 hover:to-purple-600 text-white rounded-xl"
+            >
+              Upload Another Resume
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div id="upload-form" className="flex-1">
@@ -81,7 +170,7 @@ const UploadForm = () => {
                 id="cv-upload"
                 type="file"
                 className="hidden"
-                accept=".pdf,.doc,.docx"
+                accept=".pdf,.doc,.docx,.txt"
                 onChange={handleFileChange}
                 required
               />
@@ -93,7 +182,7 @@ const UploadForm = () => {
                   ) : (
                     <>
                       <span className="text-sm font-medium text-transumee-900">Click to upload your file</span>
-                      <span className="text-xs text-transumee-900/70 mt-1">Supports PDF, DOC up to 10MB</span>
+                      <span className="text-xs text-transumee-900/70 mt-1">Supports PDF, DOC, TXT up to 10MB</span>
                     </>
                   )}
                 </div>
