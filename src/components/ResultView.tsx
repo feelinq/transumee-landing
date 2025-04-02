@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/components/ui/use-toast';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, FileDown } from 'lucide-react';
+import html2pdf from 'html2pdf.js';
 
 interface ResultViewProps {
   translatedResume: string | null;
@@ -34,6 +35,40 @@ const ResultView = ({ translatedResume, isFallbackMode, handleNewUpload }: Resul
       });
     }
   };
+  
+  const handleDownloadPDF = () => {
+    if (!translatedResume) return;
+    
+    const resumeElement = document.getElementById('resume-output');
+    if (!resumeElement) return;
+    
+    toast({
+      title: "Generating PDF...",
+      description: "Please wait while we prepare your resume",
+    });
+    
+    const options = {
+      margin: [15, 15],
+      filename: 'enhanced-resume.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    html2pdf().set(options).from(resumeElement).save().then(() => {
+      toast({
+        title: "Success!",
+        description: "Your resume PDF has been downloaded",
+      });
+    }).catch(error => {
+      console.error('PDF generation failed:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate PDF. Please try again.",
+        variant: "destructive",
+      });
+    });
+  };
 
   return (
     <div className="bg-white rounded-3xl shadow-lg p-6 md:p-8 border border-transumee-200">
@@ -48,7 +83,9 @@ const ResultView = ({ translatedResume, isFallbackMode, handleNewUpload }: Resul
       )}
       
       <div className="mb-6 p-4 bg-transumee-50 rounded-xl border border-transumee-200 max-h-[500px] overflow-y-auto">
-        <pre className="whitespace-pre-wrap text-sm text-transumee-900 font-mono">{translatedResume}</pre>
+        <div id="resume-output" className="whitespace-pre-wrap text-sm text-transumee-900 font-mono">
+          {translatedResume}
+        </div>
       </div>
       
       <div className="flex flex-col sm:flex-row gap-4 mb-4">
@@ -57,6 +94,14 @@ const ResultView = ({ translatedResume, isFallbackMode, handleNewUpload }: Resul
           className="flex-1 bg-transumee-600 hover:bg-transumee-700 text-white rounded-xl"
         >
           Copy to Clipboard
+        </Button>
+        
+        <Button
+          onClick={handleDownloadPDF}
+          className="flex-1 bg-transumee-500 hover:bg-transumee-600 text-white rounded-xl"
+        >
+          <FileDown className="mr-2 h-4 w-4" />
+          Download as PDF
         </Button>
         
         <Button 
