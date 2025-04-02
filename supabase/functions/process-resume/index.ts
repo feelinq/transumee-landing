@@ -30,7 +30,7 @@ serve(async (req) => {
     // Check if the content length is too long
     if (fileContent.length > 100000) {
       console.log("File content too large, using fallback mode");
-      const fallbackResume = generateFallbackEnhancement(fileContent, country, countrySpecificPrompt);
+      const fallbackResume = generateFallbackEnhancement(fileContent, country, countrySpecificPrompt, name, email);
       
       return new Response(
         JSON.stringify({ 
@@ -133,7 +133,7 @@ Return only the resume text, clean and formatted, ready to be saved as a PDF. Ta
         
         // Handle quota exceeded error and other errors with fallback mode
         console.log("API error detected, using fallback mode");
-        const fallbackResume = generateFallbackEnhancement(fileContent, country, countrySpecificPrompt);
+        const fallbackResume = generateFallbackEnhancement(fileContent, country, countrySpecificPrompt, name, email);
         
         return new Response(
           JSON.stringify({ 
@@ -188,7 +188,7 @@ Return only the resume text, clean and formatted, ready to be saved as a PDF. Ta
       console.error("API processing error:", apiError);
       
       // Generate a fallback enhancement without API
-      const fallbackResume = generateFallbackEnhancement(fileContent, country, countrySpecificPrompt);
+      const fallbackResume = generateFallbackEnhancement(fileContent, country, countrySpecificPrompt, name, email);
       
       return new Response(
         JSON.stringify({ 
@@ -221,7 +221,7 @@ Return only the resume text, clean and formatted, ready to be saved as a PDF. Ta
 });
 
 // Fallback enhancement function when API is unavailable
-function generateFallbackEnhancement(resumeText, country, countryPrompt) {
+function generateFallbackEnhancement(resumeText, country, countryPrompt, name, email) {
   // Extract basic sections we'd expect in a resume
   const sections = extractResumeSections(resumeText);
   
@@ -229,7 +229,7 @@ function generateFallbackEnhancement(resumeText, country, countryPrompt) {
   let enhancedResume = `${name || "CANDIDATE NAME"}\n`;
   enhancedResume += `${email || "email@example.com"}\n`;
   enhancedResume += "Phone: [Contact Number]\n";
-  enhancedResume += "LinkedIn: [LinkedIn Profile]\n\n";  // Fixed: Changed backtick to double quote
+  enhancedResume += "LinkedIn: [LinkedIn Profile]\n\n";  // Fixed: Using double quotes instead of backtick
   
   enhancedResume += "---\n\n";
   
