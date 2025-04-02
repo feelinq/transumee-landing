@@ -229,7 +229,7 @@ function generateFallbackEnhancement(resumeText, country, countryPrompt) {
   let enhancedResume = `${name || "CANDIDATE NAME"}\n`;
   enhancedResume += `${email || "email@example.com"}\n`;
   enhancedResume += "Phone: [Contact Number]\n";
-  enhancedResume += "LinkedIn: [LinkedIn Profile]\n\n`;
+  enhancedResume += "LinkedIn: [LinkedIn Profile]\n\n";  // Fixed: Changed backtick to double quote
   
   enhancedResume += "---\n\n";
   
