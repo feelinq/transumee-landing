@@ -47,7 +47,7 @@ serve(async (req) => {
     }
     
     try {
-      // Process with OpenAI
+      // Process with OpenAI - using the new expert instructions
       const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -59,18 +59,31 @@ serve(async (req) => {
           messages: [
             {
               role: "system",
-              content: `You are an expert resume translator and enhancer. 
-              Your task is to translate resumes into professional English, 
-              adapt them to the target country's hiring standards, and enhance them 
-              to highlight the candidate's strengths. Keep the same information 
-              but make it more appealing to employers.`
+              content: `You are an expert in resume analysis and transformation.
+
+You will receive a resume in plain text format. This text may have been extracted from a PDF or DOC file and might not be perfectly formatted.
+
+Your task is to:
+1. Interpret the content, even if slightly unstructured.
+2. Reconstruct it into a clean, professional English resume.
+3. Translate any non-English parts into fluent English.
+4. Organize the content into proper resume sections: 
+   - PROFESSIONAL SUMMARY
+   - WORK EXPERIENCE
+   - EDUCATION
+   - SKILLS
+   - ADDITIONAL INFORMATION
+
+Do your best to infer the meaning, fix formatting issues, and highlight the candidate's strengths. Use the hiring standards of the specified target country.
+
+❗ Output only the final resume in professional English — no comments, no explanation, no analysis.`
             },
             {
               role: "user",
-              content: `Please translate and enhance this resume for a job application in ${country}. 
+              content: `Here is a resume to enhance for ${country}. 
               ${countrySpecificPrompt}
               
-              Here's the resume content:
+              Resume content:
               ${fileContent.substring(0, 8000)}`
             }
           ],
