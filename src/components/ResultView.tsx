@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/components/ui/use-toast';
-import ChatBot from './ChatBot';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface ResultViewProps {
@@ -14,8 +13,7 @@ interface ResultViewProps {
 
 const ResultView = ({ translatedResume, isFallbackMode, handleNewUpload }: ResultViewProps) => {
   const { toast } = useToast();
-  const [showChat, setShowChat] = useState(true); // Keep this true by default
-
+  
   useEffect(() => {
     // Dispatch custom event with resume content when the component mounts
     if (translatedResume) {
@@ -50,7 +48,7 @@ const ResultView = ({ translatedResume, isFallbackMode, handleNewUpload }: Resul
       )}
       
       <div className="mb-6 p-4 bg-transumee-50 rounded-xl border border-transumee-200 max-h-[500px] overflow-y-auto">
-        <pre className="whitespace-pre-wrap text-sm text-transumee-900">{translatedResume}</pre>
+        <pre className="whitespace-pre-wrap text-sm text-transumee-900 font-mono">{translatedResume}</pre>
       </div>
       
       <div className="flex flex-col sm:flex-row gap-4 mb-4">

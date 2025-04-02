@@ -47,7 +47,7 @@ serve(async (req) => {
     }
     
     try {
-      // Process with OpenAI - using the new expert instructions
+      // Process with OpenAI - using the structured resume format instructions
       const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -59,24 +59,59 @@ serve(async (req) => {
           messages: [
             {
               role: "system",
-              content: `You are an expert in resume analysis and transformation.
+              content: `You are a resume enhancement engine.
 
-You will receive a resume in plain text format. This text may have been extracted from a PDF or DOC file and might not be perfectly formatted.
+Your job is to take a plain text resume (possibly translated from another language) and return a fully enhanced, professionally formatted version in English.
 
-Your task is to:
-1. Interpret the content, even if slightly unstructured.
-2. Reconstruct it into a clean, professional English resume.
-3. Translate any non-English parts into fluent English.
-4. Organize the content into proper resume sections: 
-   - PROFESSIONAL SUMMARY
-   - WORK EXPERIENCE
-   - EDUCATION
-   - SKILLS
-   - ADDITIONAL INFORMATION
+Your output should follow a clean layout with clear section headers in ALL CAPS, line breaks between sections, and no markdown or HTML. This format is meant to be directly used in a PDF file.
 
-Do your best to infer the meaning, fix formatting issues, and highlight the candidate's strengths. Use the hiring standards of the specified target country.
+Structure your output like this:
 
-❗ Output only the final resume in professional English — no comments, no explanation, no analysis.`
+[Full Name]  
+[Email]  
+[Phone Number]  
+[LinkedIn or Website]  
+
+---
+
+PROFESSIONAL SUMMARY  
+[A 2-3 sentence summary]
+
+---
+
+WORK EXPERIENCE  
+[Job Title]  
+[Company], [City]  
+[Date Range]  
+- Bullet point 1  
+- Bullet point 2  
+
+(repeat as needed)
+
+---
+
+EDUCATION  
+[Degree]  
+[University], [City]  
+[Date Range]
+
+---
+
+SKILLS  
+- Skill 1  
+- Skill 2  
+- Skill 3  
+
+---
+
+ADDITIONAL INFORMATION  
+[Languages, certifications, awards, or relevant notes]
+
+---
+
+References available upon request.
+
+Return only the resume text, clean and formatted, ready to be saved as a PDF. Target the resume for the job market in: ${country}.`
             },
             {
               role: "user",
@@ -191,7 +226,12 @@ function generateFallbackEnhancement(resumeText, country, countryPrompt) {
   const sections = extractResumeSections(resumeText);
   
   // Apply basic enhancements based on country
-  let enhancedResume = `ENHANCED RESUME FOR ${country.toUpperCase()} MARKET\n\n`;
+  let enhancedResume = `${name || "CANDIDATE NAME"}\n`;
+  enhancedResume += `${email || "email@example.com"}\n`;
+  enhancedResume += "Phone: [Contact Number]\n";
+  enhancedResume += "LinkedIn: [LinkedIn Profile]\n\n`;
+  
+  enhancedResume += "---\n\n";
   
   // Add professional summary
   enhancedResume += "PROFESSIONAL SUMMARY\n";
@@ -200,26 +240,83 @@ function generateFallbackEnhancement(resumeText, country, countryPrompt) {
     ". Seeking to leverage skills and expertise to contribute to organizational success " +
     "in a challenging and rewarding position.\n\n";
   
+  enhancedResume += "---\n\n";
+  
   // Add experience section if available
   if (sections.experience) {
-    enhancedResume += "PROFESSIONAL EXPERIENCE\n";
-    enhancedResume += sections.experience + "\n\n";
+    enhancedResume += "WORK EXPERIENCE\n";
+    const experienceLines = sections.experience.split('\n').filter(line => line.trim().length > 0);
+    
+    // Try to format into job entries with bullet points
+    let currentCompany = "";
+    let currentTitle = "";
+    let currentPeriod = "";
+    
+    for (const line of experienceLines) {
+      if (line.includes("20") && (line.includes("-") || line.includes("–"))) {
+        // This is likely a date range
+        currentPeriod = line.trim();
+        enhancedResume += `${currentTitle || "Position"}\n${currentCompany || "Company"}, ${country}\n${currentPeriod}\n`;
+      } else if (line.length < 50 && !line.startsWith("-") && !line.startsWith("•")) {
+        // This is likely a job title or company
+        if (!currentCompany) {
+          currentCompany = line.trim();
+        } else {
+          currentTitle = line.trim();
+        }
+      } else {
+        // This is likely a job description bullet point
+        enhancedResume += `- ${line.trim().replace(/^[-•]\s*/, "")}\n`;
+      }
+    }
+    enhancedResume += "\n---\n\n";
   }
   
   // Add education section if available
   if (sections.education) {
     enhancedResume += "EDUCATION\n";
-    enhancedResume += sections.education + "\n\n";
+    const educationLines = sections.education.split('\n').filter(line => line.trim().length > 0);
+    
+    let degree = "";
+    let institution = "";
+    let period = "";
+    
+    for (const line of educationLines) {
+      if (line.includes("20") && (line.includes("-") || line.includes("–"))) {
+        period = line.trim();
+      } else if (line.length < 100) {
+        if (!degree) {
+          degree = line.trim();
+        } else if (!institution) {
+          institution = line.trim();
+        }
+      }
+    }
+    
+    enhancedResume += `${degree || "Degree"}\n${institution || "University"}, ${country}\n${period || "Graduation Year"}\n\n`;
+    enhancedResume += "---\n\n";
   }
   
   // Add skills section if available
   if (sections.skills) {
-    enhancedResume += "SKILLS & COMPETENCIES\n";
-    enhancedResume += sections.skills + "\n\n";
+    enhancedResume += "SKILLS\n";
+    const skillsArray = sections.skills
+      .split(/[,;\n]/)
+      .map(skill => skill.trim())
+      .filter(skill => skill.length > 0 && skill.length < 50);
+    
+    for (const skill of skillsArray) {
+      enhancedResume += `- ${skill}\n`;
+    }
+    enhancedResume += "\n---\n\n";
   }
   
   // Add country-specific section
-  enhancedResume += countrySpecificSection(country);
+  enhancedResume += "ADDITIONAL INFORMATION\n";
+  enhancedResume += countrySpecificAdditionalInfo(country);
+  
+  enhancedResume += "\n---\n\n";
+  enhancedResume += "References available upon request.";
   
   return enhancedResume;
 }
@@ -275,30 +372,23 @@ function extractIndustryFromExperience(experienceText) {
   return "relevant industry";
 }
 
-// Add country-specific section based on target country
-function countrySpecificSection(country) {
+// Add country-specific additional information
+function countrySpecificAdditionalInfo(country) {
   const countryMap = {
-    "usa": "ADDITIONAL INFORMATION\n" +
-           "Authorized to work in the United States. Available for immediate start. " +
-           "Willing to relocate as necessary for the right opportunity.\n\n",
-    "uk": "ADDITIONAL INFORMATION\n" +
-          "Excellent communication skills with proficiency in British English. " +
-          "Possesses strong teamwork abilities and adaptability to new environments.\n\n",
-    "canada": "ADDITIONAL INFORMATION\n" +
-              "Adept at working in multicultural environments. " +
-              "Knowledge of both Canadian business practices and bilingual capabilities where applicable.\n\n",
-    "germany": "ADDITIONAL INFORMATION\n" +
-               "Detail-oriented with appreciation for precision and quality. " +
-               "Understanding of German business culture and structured work environments.\n\n",
-    "france": "ADDITIONAL INFORMATION\n" +
-              "Strong interpersonal skills and cultural awareness. " +
-              "Appreciation for work-life balance and French business etiquette.\n\n",
-    "australia": "ADDITIONAL INFORMATION\n" +
-                "Adaptable team player with excellent communication skills. " +
-                "Enthusiastic about contributing to a positive workplace culture.\n\n",
-    "other": "ADDITIONAL INFORMATION\n" +
-             "Globally-minded professional with cross-cultural communication skills. " +
-             "Adaptable to diverse work environments and business practices.\n\n"
+    "usa": "Authorized to work in the United States. Available for immediate start. " +
+           "Willing to relocate as necessary for the right opportunity.",
+    "uk": "Excellent communication skills with proficiency in British English. " +
+          "Possesses strong teamwork abilities and adaptability to new environments.",
+    "canada": "Adept at working in multicultural environments. " +
+              "Knowledge of both Canadian business practices and bilingual capabilities where applicable.",
+    "germany": "Detail-oriented with appreciation for precision and quality. " +
+               "Understanding of German business culture and structured work environments.",
+    "france": "Strong interpersonal skills and cultural awareness. " +
+              "Appreciation for work-life balance and French business etiquette.",
+    "australia": "Adaptable team player with excellent communication skills. " +
+                "Enthusiastic about contributing to a positive workplace culture.",
+    "other": "Globally-minded professional with cross-cultural communication skills. " +
+             "Adaptable to diverse work environments and business practices."
   };
   
   return countryMap[country.toLowerCase()] || countryMap["other"];
