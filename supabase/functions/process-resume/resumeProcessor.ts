@@ -50,9 +50,9 @@ export async function handleResumeProcessing(
             role: "system",
             content: `You are a resume enhancement engine that specializes in ${targetLanguage} resumes for ${country}.
 
-Your job is to take a resume in ANY language, detect the language, extract all meaningful information, and return a fully enhanced, professionally formatted version in ${targetLanguage} that follows the cultural and professional standards of ${country}.
+Your job is to take a resume in ANY language, analyze it, extract all meaningful information, and return a fully enhanced, professionally formatted version in ${targetLanguage} that follows the cultural and professional standards of ${country}.
 
-The output must use actual content from the input - not placeholders. Use real names and information from the input.
+The output must use ACTUAL CONTENT from the input - not placeholders. Use the real name, contact information, and experience directly from the user's resume.
 
 ${country === 'france' ? `Format specifically for France:
 - Education should be placed before experience
@@ -62,10 +62,10 @@ ${country === 'france' ? `Format specifically for France:
 
 Structure your output like this:
 
-[Full Name]  
-[Email]  
-[Phone Number]  
-[LinkedIn or Website]  
+[Full Name from input]  
+[Email from input]  
+[Phone Number from input if available]  
+[LinkedIn or Website from input if available]  
 
 ---
 
@@ -217,6 +217,9 @@ function translateSectionTitle(title: string, language: string): string {
       "Japanese": "職務要約",
       "Chinese": "专业摘要",
       "Korean": "전문 요약",
+      "Thai": "สรุปวิชาชีพ",
+      "Vietnamese": "TÓM TẮT CHUYÊN NGHIỆP",
+      "Indonesian": "RINGKASAN PROFESIONAL",
     },
     "WORK EXPERIENCE": {
       "German": "BERUFSERFAHRUNG",
@@ -234,6 +237,9 @@ function translateSectionTitle(title: string, language: string): string {
       "Japanese": "職務経歴",
       "Chinese": "工作经验",
       "Korean": "직장 경력",
+      "Thai": "ประสบการณ์การทำงาน",
+      "Vietnamese": "KINH NGHIỆM LÀM VIỆC",
+      "Indonesian": "PENGALAMAN KERJA",
     },
     "EDUCATION": {
       "German": "AUSBILDUNG",
@@ -251,6 +257,9 @@ function translateSectionTitle(title: string, language: string): string {
       "Japanese": "学歴",
       "Chinese": "教育背景",
       "Korean": "교육",
+      "Thai": "การศึกษา",
+      "Vietnamese": "HỌC VẤN",
+      "Indonesian": "PENDIDIKAN",
     },
     "SKILLS": {
       "German": "FÄHIGKEITEN",
@@ -268,6 +277,9 @@ function translateSectionTitle(title: string, language: string): string {
       "Japanese": "スキル",
       "Chinese": "技能",
       "Korean": "기술",
+      "Thai": "ทักษะ",
+      "Vietnamese": "KỸ NĂNG",
+      "Indonesian": "KETERAMPILAN",
     },
     "ADDITIONAL INFORMATION": {
       "German": "ZUSÄTZLICHE INFORMATIONEN",
@@ -285,6 +297,9 @@ function translateSectionTitle(title: string, language: string): string {
       "Japanese": "追加情報",
       "Chinese": "附加信息",
       "Korean": "추가 정보",
+      "Thai": "ข้อมูลเพิ่มเติม",
+      "Vietnamese": "THÔNG TIN THÊM",
+      "Indonesian": "INFORMASI TAMBAHAN",
     },
     "References available upon request.": {
       "German": "Referenzen auf Anfrage verfügbar.",
@@ -302,6 +317,9 @@ function translateSectionTitle(title: string, language: string): string {
       "Japanese": "照会先は要望に応じて提供可能です。",
       "Chinese": "可根据要求提供推荐信。",
       "Korean": "요청 시 참고인 정보 제공 가능.",
+      "Thai": "มีการอ้างอิงเมื่อร้องขอ",
+      "Vietnamese": "Tham khảo có sẵn theo yêu cầu.",
+      "Indonesian": "Referensi tersedia sesuai permintaan.",
     }
   };
   
