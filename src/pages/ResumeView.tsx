@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
@@ -7,6 +7,7 @@ import { FileDown, ArrowLeft } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ResumePDF from '@/components/ResumePDF';
 
 const ResumeView = () => {
   const [searchParams] = useSearchParams();
@@ -65,13 +66,8 @@ const ResumeView = () => {
           {resumeContent ? (
             <>
               <div className="mb-6 p-6 bg-white rounded-xl border border-transumee-200 shadow-sm">
-                <div id="resume-output" className="whitespace-pre-wrap text-sm text-transumee-900 font-serif">
-                  {resumeContent.split('\n').map((line, index) => (
-                    <React.Fragment key={index}>
-                      {line}
-                      <br />
-                    </React.Fragment>
-                  ))}
+                <div id="resume-output" className="overflow-hidden">
+                  <ResumePDF content={resumeContent} />
                 </div>
               </div>
               

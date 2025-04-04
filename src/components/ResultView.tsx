@@ -5,6 +5,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/components/ui/use-toast';
 import { ChevronDown, ChevronUp, FileDown } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
+import ResumePDF from '@/components/ResumePDF';
 
 interface ResultViewProps {
   translatedResume: string | null;
@@ -83,8 +84,8 @@ const ResultView = ({ translatedResume, isFallbackMode, handleNewUpload }: Resul
       )}
       
       <div className="mb-6 p-4 bg-transumee-50 rounded-xl border border-transumee-200 max-h-[500px] overflow-y-auto">
-        <div id="resume-output" className="whitespace-pre-wrap text-sm text-transumee-900 font-mono">
-          {translatedResume}
+        <div id="resume-output" className="overflow-hidden">
+          <ResumePDF content={translatedResume || ''} />
         </div>
       </div>
       
