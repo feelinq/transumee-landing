@@ -73,7 +73,7 @@ const ResultView = ({ translatedResume, isFallbackMode, handleNewUpload }: Resul
 
   return (
     <div className="bg-white rounded-3xl shadow-lg p-6 md:p-8 border border-transumee-200">
-      <h2 className="text-xl font-bold mb-6 text-center text-transumee-900">Your {isFallbackMode ? 'Enhanced' : 'Translated & Upgraded'} Resume</h2>
+      <h2 className="text-xl font-bold mb-6 text-center text-transumee-900">Your {isFallbackMode ? 'Enhanced' : 'Translated & Adapted'} Resume</h2>
       
       {isFallbackMode && (
         <Alert className="mb-4 bg-amber-50 border-amber-200">

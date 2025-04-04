@@ -87,11 +87,11 @@ const FormView = ({
               </div>
             </label>
           </div>
-          <div className="text-xs text-transumee-900/70 mt-1">Our AI will translate your resume content from any language</div>
+          <div className="text-xs text-transumee-900/70 mt-1">Our AI automatically detects your resume's language and translates it professionally</div>
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="country" className="text-transumee-900">Target Country (Resume will be translated to local language)</Label>
+          <Label htmlFor="country" className="text-transumee-900">Target Country (Resume will be adapted for local standards)</Label>
           <Select required value={country} onValueChange={setCountry}>
             <SelectTrigger id="country" className="rounded-xl border-transumee-200 focus:ring-transumee-600">
               <SelectValue placeholder="Select target country" />
@@ -125,7 +125,7 @@ const FormView = ({
               <SelectItem value="other">Other (English)</SelectItem>
             </SelectContent>
           </Select>
-          <div className="text-xs text-transumee-900/70">Our AI will adapt your resume format to match the selected country's standards</div>
+          <div className="text-xs text-transumee-900/70">Our AI will adapt your resume format and style to match the selected country's professional standards</div>
         </div>
         
         <Button 
