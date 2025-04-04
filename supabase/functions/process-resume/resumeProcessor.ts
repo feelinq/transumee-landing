@@ -1,4 +1,3 @@
-
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 import { corsHeaders, getCountrySpecificPrompt, getTargetLanguage } from "./utils.ts";
 import { generateFallbackEnhancement } from "./fallbackEnhancement.ts";
@@ -10,15 +9,23 @@ export async function handleResumeProcessing(
   country: string,
   fileType?: string
 ) {
+  // Log the details for debugging
+  console.log(`Processing resume for user ${name} targeting ${country}`);
+  console.log(`Resume content length: ${fileContent.length} characters`);
+  console.log(`File type: ${fileType}`);
+  
   // Get target country specific instructions
   const countrySpecificPrompt = getCountrySpecificPrompt(country);
   
   // Get target language for the country
   const targetLanguage = getTargetLanguage(country);
   
-  // Check if the content length is too long
-  if (fileContent.length > 100000) {
-    console.log("File content too large, using fallback mode");
+  // Check if the content length is too large for API processing
+  // OpenAI has token limits, so we need to adjust this threshold accordingly
+  const MAX_CONTENT_LENGTH = 30000; // Adjusted threshold for file size
+  
+  if (fileContent.length > MAX_CONTENT_LENGTH) {
+    console.log(`File content too large (${fileContent.length} chars), using fallback mode`);
     const fallbackResume = generateFallbackEnhancement(fileContent, country, countrySpecificPrompt, name, email);
     
     return new Response(
@@ -36,6 +43,10 @@ export async function handleResumeProcessing(
   }
   
   try {
+    // Extract a sample of the content for logging (first 200 chars)
+    const contentSample = fileContent.substring(0, 200).replace(/\n/g, ' ') + '...';
+    console.log(`Content sample: ${contentSample}`);
+
     // Process with OpenAI - using the structured resume format instructions with country-specific guidance
     const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -104,15 +115,20 @@ ${targetLanguage === "English" ? "ADDITIONAL INFORMATION" : translateSectionTitl
 
 ${targetLanguage === "English" ? "References available upon request." : translateSectionTitle("References available upon request.", targetLanguage)}
 
-Return only the resume text with real data from the input, clean and formatted, ready to be saved as a PDF.`
+Return only the resume text with real data from the input, clean and formatted, ready to be saved as a PDF.
+
+IMPORTANT: Do not return placeholders like [Degree from input]. Replace all placeholders with actual content from the resume.`
           },
           {
             role: "user",
             content: `Here is a resume to enhance for ${country} in ${targetLanguage}. 
             ${countrySpecificPrompt}
             
+            Name: ${name}
+            Email: ${email}
+            
             Resume content:
-            ${fileContent.substring(0, 8000)}`
+            ${fileContent.substring(0, MAX_CONTENT_LENGTH)}`
           }
         ],
         temperature: 0.7,
@@ -144,6 +160,8 @@ Return only the resume text with real data from the input, clean and formatted, 
 
     const openaiData = await openaiResponse.json();
     const enhancedResume = openaiData.choices[0].message.content;
+    
+    console.log("AI generated resume successfully");
     
     // Save to Supabase
     try {

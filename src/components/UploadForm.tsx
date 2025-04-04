@@ -13,6 +13,7 @@ const UploadForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [translatedResume, setTranslatedResume] = useState<string | null>(null);
   const [isFallbackMode, setIsFallbackMode] = useState(false);
+  const [originalContent, setOriginalContent] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,7 +43,12 @@ const UploadForm = () => {
       fileReader.onload = async (event) => {
         const fileContent = event.target?.result as string;
         
+        // Store original content for debugging purposes
+        setOriginalContent(fileContent);
+        
         try {
+          console.log(`Processing resume for ${country} with file size: ${fileContent.length} characters`);
+          
           // Call our edge function
           const response = await supabase.functions.invoke("process-resume", {
             body: {
@@ -58,9 +64,22 @@ const UploadForm = () => {
             throw new Error(response.error.message || "Error processing resume");
           }
 
+          console.log("Response from edge function:", response.data);
+
           // Check if we're in fallback mode
           setIsFallbackMode(!!response.data?.fallbackMode);
-          setTranslatedResume(response.data?.enhancedResume || "Error: No resume data received");
+          
+          if (response.data?.enhancedResume) {
+            setTranslatedResume(response.data.enhancedResume);
+            
+            // Dispatch event with resume content for ChatBot
+            const event = new CustomEvent('resumeProcessed', {
+              detail: { resumeContent: response.data.enhancedResume }
+            });
+            window.dispatchEvent(event);
+          } else {
+            setTranslatedResume("Error: No resume data received");
+          }
           
           toast({
             title: "Success!",
@@ -80,7 +99,17 @@ const UploadForm = () => {
           
           setIsFallbackMode(true);
           // If the API entirely fails, we'll still show something to the user
-          setTranslatedResume("ENHANCED RESUME\n\nWe encountered an issue processing your resume with our AI system. Here's a simplified enhancement:\n\nProfessional Summary: Detail-oriented professional seeking opportunities in the " + country + " job market.\n\n[Your original resume content would appear here, professionally formatted.]");
+          const fallbackResume = `ENHANCED RESUME\n\nWe encountered an issue processing your resume with our AI system. Here's a simplified enhancement:\n\nProfessional Summary: Detail-oriented professional seeking opportunities in the ${country} job market.\n\n[Your original resume content would appear here, professionally formatted.]`;
+          
+          setTranslatedResume(fallbackResume);
+          
+          // Also dispatch event with resume content for ChatBot
+          const event = new CustomEvent('resumeProcessed', {
+            detail: { resumeContent: fallbackResume }
+          });
+          window.dispatchEvent(event);
+        } finally {
+          setIsSubmitting(false);
         }
       };
       
@@ -107,6 +136,7 @@ const UploadForm = () => {
 
   const handleNewUpload = () => {
     setTranslatedResume(null);
+    setOriginalContent(null);
     setName('');
     setEmail('');
     setFile(null);
