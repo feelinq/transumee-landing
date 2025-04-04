@@ -56,7 +56,7 @@ const ResumePDF = ({ content }: ResumePDFProps) => {
           <div className="pl-1">
             {sectionContent.map((line, lineIdx) => {
               // Check if it's a bullet point
-              if (line.trim().startsWith('-')) {
+              if (line.trim().startsWith('-') || line.trim().startsWith('•')) {
                 return (
                   <div key={`line-${lineIdx}`} className="ml-4 mb-1 flex">
                     <span className="mr-2">•</span>

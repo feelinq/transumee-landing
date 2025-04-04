@@ -36,7 +36,7 @@ export async function handleResumeProcessing(
   }
   
   try {
-    // Process with OpenAI - using the structured resume format instructions
+    // Process with OpenAI - using the structured resume format instructions with country-specific guidance
     const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -48,11 +48,17 @@ export async function handleResumeProcessing(
         messages: [
           {
             role: "system",
-            content: `You are a resume enhancement engine.
+            content: `You are a resume enhancement engine that specializes in ${targetLanguage} resumes for ${country}.
 
-Your job is to take a plain text resume (possibly translated from another language) and return a fully enhanced, professionally formatted version in ${targetLanguage}.
+Your job is to take a resume in ANY language, detect the language, extract all meaningful information, and return a fully enhanced, professionally formatted version in ${targetLanguage} that follows the cultural and professional standards of ${country}.
 
-Your output should follow a clean layout with clear section headers in ALL CAPS, line breaks between sections, and no markdown or HTML. This format is meant to be directly used in a PDF file.
+The output must use actual content from the input - not placeholders. Use real names and information from the input.
+
+${country === 'france' ? `Format specifically for France:
+- Education should be placed before experience
+- Emphasize certifications and diplomas
+- Use formal, native-level French
+- Note where a professional photo would go with [PHOTO]` : ''}
 
 Structure your output like this:
 
@@ -64,43 +70,41 @@ Structure your output like this:
 ---
 
 ${targetLanguage === "English" ? "PROFESSIONAL SUMMARY" : translateSectionTitle("PROFESSIONAL SUMMARY", targetLanguage)}  
-[A 2-3 sentence summary]
-
----
-
-${targetLanguage === "English" ? "WORK EXPERIENCE" : translateSectionTitle("WORK EXPERIENCE", targetLanguage)}  
-[Job Title]  
-[Company], [City]  
-[Date Range]  
-- Bullet point 1  
-- Bullet point 2  
-
-(repeat as needed)
+[A 2-3 sentence summary based on actual input data]
 
 ---
 
 ${targetLanguage === "English" ? "EDUCATION" : translateSectionTitle("EDUCATION", targetLanguage)}  
-[Degree]  
-[University], [City]  
-[Date Range]
+[Degree from input]  
+[University from input], [City from input]  
+[Date Range from input]
+
+---
+
+${targetLanguage === "English" ? "WORK EXPERIENCE" : translateSectionTitle("WORK EXPERIENCE", targetLanguage)}  
+[Job Title from input]  
+[Company from input], [City from input]  
+[Date Range from input]  
+- [Real bullet points translated from input]  
+- [Real bullet points translated from input]  
 
 ---
 
 ${targetLanguage === "English" ? "SKILLS" : translateSectionTitle("SKILLS", targetLanguage)}  
-- Skill 1  
-- Skill 2  
-- Skill 3  
+- [Actual skill from input]  
+- [Actual skill from input]  
+- [Actual skill from input]  
 
 ---
 
 ${targetLanguage === "English" ? "ADDITIONAL INFORMATION" : translateSectionTitle("ADDITIONAL INFORMATION", targetLanguage)}  
-[Languages, certifications, awards, or relevant notes]
+[Translated languages, certifications, awards from input]
 
 ---
 
 ${targetLanguage === "English" ? "References available upon request." : translateSectionTitle("References available upon request.", targetLanguage)}
 
-Return only the resume text, clean and formatted, ready to be saved as a PDF. Target the resume for the job market in: ${country} using ${targetLanguage} language.`
+Return only the resume text with real data from the input, clean and formatted, ready to be saved as a PDF.`
           },
           {
             role: "user",
