@@ -89,19 +89,25 @@ const FormView = ({
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="country" className="text-transumee-900">Target Country</Label>
+          <Label htmlFor="country" className="text-transumee-900">Target Country (Resume will be translated to local language)</Label>
           <Select required value={country} onValueChange={setCountry}>
             <SelectTrigger id="country" className="rounded-xl border-transumee-200 focus:ring-transumee-600">
               <SelectValue placeholder="Select target country" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="usa">United States</SelectItem>
-              <SelectItem value="uk">United Kingdom</SelectItem>
-              <SelectItem value="canada">Canada</SelectItem>
-              <SelectItem value="germany">Germany</SelectItem>
-              <SelectItem value="france">France</SelectItem>
-              <SelectItem value="australia">Australia</SelectItem>
-              <SelectItem value="other">Other EU Country</SelectItem>
+              <SelectItem value="usa">United States (English)</SelectItem>
+              <SelectItem value="uk">United Kingdom (English)</SelectItem>
+              <SelectItem value="canada">Canada (English)</SelectItem>
+              <SelectItem value="australia">Australia (English)</SelectItem>
+              <SelectItem value="germany">Germany (German)</SelectItem>
+              <SelectItem value="france">France (French)</SelectItem>
+              <SelectItem value="spain">Spain (Spanish)</SelectItem>
+              <SelectItem value="italy">Italy (Italian)</SelectItem>
+              <SelectItem value="portugal">Portugal (Portuguese)</SelectItem>
+              <SelectItem value="netherlands">Netherlands (Dutch)</SelectItem>
+              <SelectItem value="sweden">Sweden (Swedish)</SelectItem>
+              <SelectItem value="poland">Poland (Polish)</SelectItem>
+              <SelectItem value="other">Other EU Country (English)</SelectItem>
             </SelectContent>
           </Select>
         </div>

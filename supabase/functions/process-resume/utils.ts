@@ -22,6 +22,35 @@ export function getCountrySpecificPrompt(country: string): string {
   return countryPrompts[country.toLowerCase()] || countryPrompts["other"];
 }
 
+// Get target language based on the country
+export function getTargetLanguage(country: string): string {
+  const countryLanguageMap: Record<string, string> = {
+    "usa": "English",
+    "uk": "English",
+    "canada": "English",
+    "australia": "English",
+    "germany": "German",
+    "france": "French",
+    "spain": "Spanish",
+    "italy": "Italian",
+    "portugal": "Portuguese",
+    "netherlands": "Dutch",
+    "belgium": "Dutch",
+    "sweden": "Swedish",
+    "norway": "Norwegian",
+    "denmark": "Danish",
+    "finland": "Finnish",
+    "poland": "Polish",
+    "russia": "Russian",
+    "japan": "Japanese",
+    "china": "Chinese",
+    "korea": "Korean",
+    "other": "English" // Default to English for other countries
+  };
+  
+  return countryLanguageMap[country.toLowerCase()] || "English";
+}
+
 // Add country-specific additional information
 export function countrySpecificAdditionalInfo(country: string): string {
   const countryMap: Record<string, string> = {

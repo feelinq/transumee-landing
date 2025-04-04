@@ -35,6 +35,8 @@ const ResumePDF = ({ content }: ResumePDFProps) => {
       const sectionTitle = lines[0]?.trim();
       const sectionContent = lines.slice(1);
       
+      // Translate section titles based on target country if found in content
+      // The API will already return the translated title, this just handles the display
       return (
         <div key={`section-${index}`} className="mb-5">
           {sectionTitle && (
