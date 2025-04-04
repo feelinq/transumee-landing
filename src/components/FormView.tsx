@@ -46,6 +46,7 @@ const FormView = ({
               required
               className="rounded-xl border-transumee-200 focus-visible:ring-transumee-600"
             />
+            <div className="text-xs text-transumee-900/70">You can enter your name in any language</div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="email" className="text-transumee-900">Email</Label>
@@ -80,12 +81,13 @@ const FormView = ({
                 ) : (
                   <>
                     <span className="text-sm font-medium text-transumee-900">Click to upload your file</span>
-                    <span className="text-xs text-transumee-900/70 mt-1">Supports PDF, DOC, TXT up to 10MB</span>
+                    <span className="text-xs text-transumee-900/70 mt-1">Supports PDF, DOC, TXT in any language</span>
                   </>
                 )}
               </div>
             </label>
           </div>
+          <div className="text-xs text-transumee-900/70 mt-1">Our AI will translate your resume content from any language</div>
         </div>
         
         <div className="space-y-2">
@@ -123,6 +125,7 @@ const FormView = ({
               <SelectItem value="other">Other (English)</SelectItem>
             </SelectContent>
           </Select>
+          <div className="text-xs text-transumee-900/70">Our AI will adapt your resume format to match the selected country's standards</div>
         </div>
         
         <Button 
