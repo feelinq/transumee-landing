@@ -107,7 +107,20 @@ const FormView = ({
               <SelectItem value="netherlands">Netherlands (Dutch)</SelectItem>
               <SelectItem value="sweden">Sweden (Swedish)</SelectItem>
               <SelectItem value="poland">Poland (Polish)</SelectItem>
-              <SelectItem value="other">Other EU Country (English)</SelectItem>
+              
+              {/* Adding Asian countries */}
+              <SelectItem value="japan">Japan (Japanese)</SelectItem>
+              <SelectItem value="china">China (Chinese)</SelectItem>
+              <SelectItem value="korea">South Korea (Korean)</SelectItem>
+              <SelectItem value="india">India (English)</SelectItem>
+              <SelectItem value="singapore">Singapore (English)</SelectItem>
+              <SelectItem value="malaysia">Malaysia (English)</SelectItem>
+              <SelectItem value="thailand">Thailand (Thai)</SelectItem>
+              <SelectItem value="vietnam">Vietnam (Vietnamese)</SelectItem>
+              <SelectItem value="philippines">Philippines (Filipino/English)</SelectItem>
+              <SelectItem value="indonesia">Indonesia (Indonesian)</SelectItem>
+              
+              <SelectItem value="other">Other (English)</SelectItem>
             </SelectContent>
           </Select>
         </div>
