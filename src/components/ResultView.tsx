@@ -71,6 +71,28 @@ const ResultView = ({ translatedResume, isFallbackMode, handleNewUpload }: Resul
     });
   };
 
+  // If no content is available, show a message instead of empty content
+  if (!translatedResume) {
+    return (
+      <div className="bg-white rounded-3xl shadow-lg p-6 md:p-8 border border-transumee-200">
+        <h2 className="text-xl font-bold mb-6 text-center text-transumee-900">Resume Processing Error</h2>
+        <Alert className="mb-4 bg-red-50 border-red-200">
+          <AlertDescription className="text-sm text-red-800">
+            We couldn't process your resume. Please try again or upload a different file.
+          </AlertDescription>
+        </Alert>
+        <div className="flex justify-center">
+          <Button 
+            onClick={handleNewUpload}
+            className="bg-transumee-600 hover:bg-transumee-700 text-white rounded-xl"
+          >
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-3xl shadow-lg p-6 md:p-8 border border-transumee-200">
       <h2 className="text-xl font-bold mb-6 text-center text-transumee-900">Your {isFallbackMode ? 'Enhanced' : 'Translated & Adapted'} Resume</h2>

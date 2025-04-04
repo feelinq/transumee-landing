@@ -8,9 +8,20 @@ interface ResumePDFProps {
 const ResumePDF = ({ content }: ResumePDFProps) => {
   // Function to process resume content and format it properly
   const formatResumeContent = () => {
-    if (!content) return [];
+    if (!content || content.trim() === '') {
+      return [<div key="empty" className="text-center text-gray-500">No resume content available</div>];
+    }
     
     const sections = content.split('---').filter(Boolean);
+    
+    if (sections.length === 0) {
+      // If no proper sections are found, display the content as-is with basic formatting
+      return (
+        <div className="whitespace-pre-wrap">
+          {content}
+        </div>
+      );
+    }
     
     return sections.map((section, index) => {
       const lines = section.trim().split('\n');
@@ -35,8 +46,6 @@ const ResumePDF = ({ content }: ResumePDFProps) => {
       const sectionTitle = lines[0]?.trim();
       const sectionContent = lines.slice(1);
       
-      // Translate section titles based on target country if found in content
-      // The API will already return the translated title, this just handles the display
       return (
         <div key={`section-${index}`} className="mb-5">
           {sectionTitle && (

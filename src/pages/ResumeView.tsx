@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
@@ -11,8 +11,22 @@ import ResumePDF from '@/components/ResumePDF';
 
 const ResumeView = () => {
   const [searchParams] = useSearchParams();
-  const resumeContent = searchParams.get('content');
+  const [resumeContent, setResumeContent] = useState<string | null>(null);
   const { toast } = useToast();
+  
+  useEffect(() => {
+    // Get and decode the content from URL parameters
+    const content = searchParams.get('content');
+    if (content) {
+      try {
+        const decodedContent = decodeURIComponent(content);
+        setResumeContent(decodedContent);
+      } catch (error) {
+        console.error("Error decoding resume content:", error);
+        setResumeContent("Error: Unable to decode resume content");
+      }
+    }
+  }, [searchParams]);
   
   const handleDownloadPDF = () => {
     if (!resumeContent) return;
