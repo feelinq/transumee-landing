@@ -47,7 +47,9 @@ const UploadForm = () => {
         setOriginalContent(fileContent);
         
         try {
-          console.log(`Processing resume for ${country} with file size: ${fileContent.length} characters`);
+          console.log(`Processing resume for ${name} (${email}) targeting ${country}`);
+          console.log(`File type: ${file.type}, size: ${fileContent.length} characters`);
+          console.log(`First 100 chars of content: ${fileContent.substring(0, 100)}...`);
           
           // Call our edge function
           const response = await supabase.functions.invoke("process-resume", {
@@ -61,6 +63,7 @@ const UploadForm = () => {
           });
           
           if (response.error) {
+            console.error("Supabase function error:", response.error);
             throw new Error(response.error.message || "Error processing resume");
           }
 
@@ -70,23 +73,36 @@ const UploadForm = () => {
           setIsFallbackMode(!!response.data?.fallbackMode);
           
           if (response.data?.enhancedResume) {
+            console.log("Resume enhancement successful. Length:", response.data.enhancedResume.length);
             setTranslatedResume(response.data.enhancedResume);
             
             // Dispatch event with resume content for ChatBot
             const event = new CustomEvent('resumeProcessed', {
-              detail: { resumeContent: response.data.enhancedResume }
+              detail: { 
+                resumeContent: response.data.enhancedResume,
+                name,
+                email,
+                country
+              }
             });
             window.dispatchEvent(event);
+            
+            toast({
+              title: "Success!",
+              description: response.data?.fallbackMode 
+                ? "Your resume has been enhanced using our simplified system."
+                : "Your resume has been translated and upgraded successfully.",
+            });
           } else {
-            setTranslatedResume("Error: No resume data received");
+            console.error("No resume data received in the response");
+            setTranslatedResume("Error: No resume data received from our processing service. Please try again.");
+            
+            toast({
+              title: "Processing Error",
+              description: "No resume data was returned. Please try again with a different file.",
+              variant: "destructive",
+            });
           }
-          
-          toast({
-            title: "Success!",
-            description: response.data?.fallbackMode 
-              ? "Your resume has been enhanced using our simplified system."
-              : "Your resume has been translated and upgraded successfully.",
-          });
         } catch (apiError) {
           console.error("API Error:", apiError);
           
@@ -99,13 +115,18 @@ const UploadForm = () => {
           
           setIsFallbackMode(true);
           // If the API entirely fails, we'll still show something to the user
-          const fallbackResume = `ENHANCED RESUME\n\nWe encountered an issue processing your resume with our AI system. Here's a simplified enhancement:\n\nProfessional Summary: Detail-oriented professional seeking opportunities in the ${country} job market.\n\n[Your original resume content would appear here, professionally formatted.]`;
+          const fallbackResume = `ENHANCED RESUME FOR ${name}\n\nEmail: ${email}\n\nWe encountered an issue processing your resume with our AI system. Here's a simplified enhancement:\n\nProfessional Summary: Detail-oriented professional seeking opportunities in the ${country} job market.\n\n[Your original resume content would appear here, professionally formatted.]`;
           
           setTranslatedResume(fallbackResume);
           
           // Also dispatch event with resume content for ChatBot
           const event = new CustomEvent('resumeProcessed', {
-            detail: { resumeContent: fallbackResume }
+            detail: { 
+              resumeContent: fallbackResume,
+              name,
+              email,
+              country
+            }
           });
           window.dispatchEvent(event);
         } finally {
@@ -113,7 +134,8 @@ const UploadForm = () => {
         }
       };
       
-      fileReader.onerror = () => {
+      fileReader.onerror = (error) => {
+        console.error("FileReader error:", error);
         toast({
           title: "File Error",
           description: "Error reading your file. Please try another file.",
